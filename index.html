@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificação de Segurança</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f7f9;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        /* Símbolo de Proteção (Escudo) */
+        .shield-icon {
+            font-size: 50px;
+            color: #0088cc;
+            margin-bottom: 20px;
+        }
+
+        .btn-verify {
+            position: relative;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            min-width: 140px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-verify:hover {
+            background-color: #0077b5;
+        }
+
+        /* Spinner (Roda a rodar) */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-verify.loading .btn-text {
+            display: none;
+        }
+
+        .btn-verify.loading .loader {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="shield-icon">🛡️</div>
+        
+        <button class="btn-verify" id="verifyBtn">
+            <span class="btn-text">Verify</span>
+            <div class="loader"></div>
+        </button>
+    </div>
+
+    <script>
+        const btn = document.getElementById('verifyBtn');
+        const telegramLink = "https://t.me/oseucanal"; // <--- COLOCA O TEU LINK AQUI
+
+        btn.addEventListener('click', () => {
+            // Adiciona a classe de carregamento
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            // Aguarda 0.6 segundos (600ms)
+            setTimeout(() => {
+                // Redireciona para o Telegram
+                window.location.href = telegramLink;
+            }, 600);
+        });
+    </script>
+
+</body>
+</html>
