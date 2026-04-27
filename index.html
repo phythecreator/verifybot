@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudShield | Secure Verification</title>
+    <title>CloudShield | Security Verification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -29,16 +29,11 @@
             transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 162, 255, 0.3); }
-        #resultArea { display: none; margin-top: 20px; animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #resultArea { display: none; margin-top: 20px; }
         .code-display {
             font-size: 42px; font-weight: 800; color: #fff; background: rgba(255,255,255,0.05);
             padding: 15px; border-radius: 12px; border: 2px dashed var(--primary); margin: 15px 0; letter-spacing: 4px;
         }
-        .spinner { display: none; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.2); border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.6s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading .spinner { display: block; }
-        .loading .btn-content { display: none; }
     </style>
 </head>
 <body>
@@ -47,33 +42,32 @@
         <div class="icon-container"><i class="fa-solid fa-user-check"></i></div>
         <div id="step1">
             <h1>Identity Check</h1>
-            <p>Click the button to reveal your secure access code.</p>
+            <p>Click below to reveal your secure 4-digit access code.</p>
             <button class="btn-main" id="verifyBtn">
-                <div class="btn-content">Verify Now</div>
-                <div class="spinner"></div>
+                <i class="fa-solid fa-eye"></i> Reveal Code
             </button>
         </div>
         <div id="resultArea">
-            <p style="color: var(--primary); font-weight: 600;">YOUR CODE:</p>
-            <div class="code-display" id="codeOut">----</div>
-            <p style="font-size: 13px;">Copy this code and send it back to the Telegram Bot.</p>
+            <p style="color: var(--primary); font-weight: 600;">YOUR ACCESS CODE:</p>
+            <div class="code-display" id="codeOut">ERROR</div>
+            <p style="font-size: 13px;">Go back to Telegram and type this code to get access.</p>
         </div>
     </div>
-
+    
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script>
+        // Efeito de fundo
         particlesJS("particles-js", {"particles":{"number":{"value":60},"color":{"value":"#00a2ff"},"opacity":{"value":0.2},"size":{"value":2},"line_linked":{"enable":true,"distance":150,"color":"#00a2ff","opacity":0.1}}});
         
+        // Vai buscar o código que o Python enviou no link
         const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code') || "NONE";
+        const code = urlParams.get('c') || "0000";
 
+        // Lógica do botão
         document.getElementById('verifyBtn').addEventListener('click', function() {
-            this.parentElement.classList.add('loading');
-            setTimeout(() => {
-                document.getElementById('step1').style.display = 'none';
-                document.getElementById('resultArea').style.display = 'block';
-                document.getElementById('codeOut').innerText = code;
-            }, 600);
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('resultArea').style.display = 'block';
+            document.getElementById('codeOut').innerText = code;
         });
     </script>
 </body>
