@@ -1,74 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CloudShield | Security Verification</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary: #00a2ff; --bg: #05070a; --card-bg: rgba(15, 20, 28, 0.9); }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; color: white; }
-        #particles-js { position: absolute; width: 100%; height: 100%; z-index: 0; }
-        .verify-card {
-            position: relative; z-index: 1; background: var(--card-bg); backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1); padding: 50px 40px; border-radius: 32px;
-            text-align: center; width: 95%; max-width: 420px; box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-        }
-        .icon-container {
-            width: 80px; height: 80px; background: rgba(0, 162, 255, 0.1); border-radius: 22px;
-            display: flex; align-items: center; justify-content: center; margin: 0 auto 25px;
-            border: 1px solid rgba(0, 162, 255, 0.3); color: var(--primary); font-size: 35px;
-        }
-        h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
-        p { color: #94a3b8; font-size: 15px; margin-bottom: 30px; line-height: 1.5; }
-        .btn-main {
-            width: 100%; background: var(--primary); color: white; border: none; padding: 18px;
-            font-size: 17px; font-weight: 700; border-radius: 15px; cursor: pointer;
-            transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 162, 255, 0.3); }
-        #resultArea { display: none; margin-top: 20px; }
-        .code-display {
-            font-size: 42px; font-weight: 800; color: #fff; background: rgba(255,255,255,0.05);
-            padding: 15px; border-radius: 12px; border: 2px dashed var(--primary); margin: 15px 0; letter-spacing: 4px;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-deep:    #04080f;
+      --bg-card:    #090f1f;
+      --blue-1:     #1a3a6e;
+      --blue-2:     #2255a4;
+      --blue-3:     #4a80d4;
+      --blue-soft:  #7aaee8;
+      --blue-pale:  #b8d0f0;
+      --text:       #cdd9ef;
+      --text-dim:   #6a82a8;
+      --text-faint: #2e3f5c;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg-deep);
+      color: var(--text);
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ── Background ── */
+    .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    .bg-glow {
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 50%, rgba(26,58,110,0.45) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 30% 70%, rgba(10,30,70,0.3) 0%, transparent 60%);
+    }
+
+    .bg-grid {
+      background-image:
+        linear-gradient(rgba(74,128,212,0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74,128,212,0.045) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.16;
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 420px; height: 420px; background: #1a3a6e; top: -100px; left: -120px; }
+    .orb-2 { width: 300px; height: 300px; background: #0e265a; bottom: -80px; right: -80px; animation-delay: -7s; }
+    .orb-3 { width: 200px; height: 200px; background: #2255a4; top: 40%; right: 8%;    animation-delay: -13s; }
+
+    @keyframes drift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(28px,18px) scale(1.07); }
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 380px;
+      padding: 52px 44px 48px;
+      background: linear-gradient(160deg, rgba(12,20,42,0.96) 0%, rgba(6,10,24,0.98) 100%);
+      border: 1px solid rgba(74,128,212,0.2);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 34px;
+      backdrop-filter: blur(28px);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.025) inset,
+        0 32px 80px rgba(0,0,0,0.72),
+        0 0 100px rgba(26,58,110,0.28);
+      animation: cardIn 0.8s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 12%; right: 12%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(122,174,232,0.55), transparent);
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      animation: fadeDown 0.7s 0.15s both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .shield-wrap {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .badge-ring {
+      position: absolute;
+      inset: -9px;
+      border-radius: 50%;
+      border: 1px solid rgba(74,128,212,0.22);
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ring {
+      0%,100% { opacity: 0.25; transform: scale(1); }
+      50%      { opacity: 0.6;  transform: scale(1.06); }
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--blue-pale);
+    }
+
+    .subtitle {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 2.5px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    /* divider */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--text-faint), transparent);
+      animation: fadeDown 0.7s 0.22s both;
+    }
+
+    /* ── Captcha ── */
+    .captcha-box {
+      width: 100%;
+      border: 1px solid rgba(74,128,212,0.18);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(8,15,38,0.6);
+      animation: fadeDown 0.7s 0.28s both;
+    }
+
+    .captcha-label {
+      font-size: 15px;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    .captcha-ctrl {
+      width: 30px;
+      height: 30px;
+      border: 1.5px solid var(--blue-1);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8,16,42,0.7);
+      flex-shrink: 0;
+      position: relative;
+      transition: border-color 0.3s, background 0.3s;
+    }
+
+    .captcha-ctrl.spinning { border-color: transparent; }
+    .captcha-ctrl.done     { border-color: var(--blue-3); background: rgba(34,85,164,0.18); }
+
+    .spinner-ring {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid rgba(74,128,212,0.18);
+      border-top-color: var(--blue-3);
+      border-right-color: var(--blue-soft);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      position: absolute;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .captcha-ctrl.spinning .spinner-ring { display: block; }
+    .check-icon { display: none; }
+    .captcha-ctrl.done .check-icon { display: block; }
+
+    /* ── Button ── */
+    .btn-verify {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #162e5e 0%, #0e2050 50%, #152c5c 100%);
+      border: 1px solid rgba(74,128,212,0.38);
+      border-radius: 10px;
+      color: var(--blue-pale);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s, color 0.3s;
+      animation: fadeDown 0.7s 0.34s both;
+    }
+
+    .btn-verify::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(74,128,212,0.14), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-verify:hover:not(:disabled)::before { opacity: 1; }
+
+    .btn-verify:hover:not(:disabled) {
+      border-color: rgba(74,128,212,0.65);
+      box-shadow: 0 4px 28px rgba(26,58,110,0.35), 0 0 0 1px rgba(74,128,212,0.08) inset;
+      color: #d4e4f8;
+    }
+
+    .btn-verify:disabled { opacity: 0.38; cursor: not-allowed; }
+
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      transform: scale(0);
+      background: rgba(122,174,232,0.18);
+      animation: ripple-anim 0.65s linear;
+      pointer-events: none;
+    }
+
+    @keyframes ripple-anim { to { transform: scale(5); opacity: 0; } }
+
+    /* ── Result ── */
+    .result { display: none; flex-direction: column; align-items: center; gap: 18px; width: 100%; }
+
+    .result.visible {
+      display: flex;
+      animation: resultIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    @keyframes resultIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .code-wrap {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(10,20,52,0.85), rgba(7,12,34,0.9));
+      border: 1px solid rgba(74,128,212,0.28);
+      border-radius: 10px;
+      padding: 22px 16px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .code-wrap::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(122,174,232,0.38), transparent);
+    }
+
+    .code-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .code-display {
+      font-family: 'DM Mono', monospace;
+      font-size: 36px;
+      letter-spacing: 10px;
+      color: var(--blue-soft);
+      padding-left: 10px;
+    }
+
+    .instruction {
+      font-size: 13.5px;
+      font-weight: 300;
+      color: var(--text-dim);
+      text-align: center;
+      line-height: 1.85;
+    }
+
+    .instruction em {
+      color: var(--blue-pale);
+      font-style: normal;
+      font-weight: 400;
+    }
+
+    /* footer */
+    .footer-stamp {
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 2.5px;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      animation: fadeDown 0.7s 0.44s both;
+    }
+  </style>
 </head>
 <body>
-    <div id="particles-js"></div>
-    <div class="verify-card">
-        <div class="icon-container"><i class="fa-solid fa-user-check"></i></div>
-        <div id="step1">
-            <h1>Identity Check</h1>
-            <p>Click below to reveal your secure 4-digit access code.</p>
-            <button class="btn-main" id="verifyBtn">
-                <i class="fa-solid fa-eye"></i> Reveal Code
-            </button>
-        </div>
-        <div id="resultArea">
-            <p style="color: var(--primary); font-weight: 600;">YOUR ACCESS CODE:</p>
-            <div class="code-display" id="codeOut">ERROR</div>
-            <p style="font-size: 13px;">Go back to Telegram and type this code to get access.</p>
-        </div>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script>
-        // Efeito de fundo
-        particlesJS("particles-js", {"particles":{"number":{"value":60},"color":{"value":"#00a2ff"},"opacity":{"value":0.2},"size":{"value":2},"line_linked":{"enable":true,"distance":150,"color":"#00a2ff","opacity":0.1}}});
-        
-        // Vai buscar o código que o Python enviou no link
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('c') || "0000";
 
-        // Lógica do botão
-        document.getElementById('verifyBtn').addEventListener('click', function() {
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('resultArea').style.display = 'block';
-            document.getElementById('codeOut').innerText = code;
-        });
-    </script>
+<div class="bg-layer bg-glow"></div>
+<div class="bg-layer bg-grid"></div>
+<div class="bg-layer">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="card">
+
+  <div class="header">
+    <div class="shield-wrap">
+      <div class="badge-ring"></div>
+      <svg width="58" height="58" viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M29 5L9 13V29C9 40.6 17.9 51.3 29 54C40.1 51.3 49 40.6 49 29V13L29 5Z"
+              fill="rgba(22,50,110,0.55)" stroke="rgba(74,128,212,0.5)" stroke-width="1.2"/>
+        <polyline points="20,29 25.5,34.5 38,22"
+                  stroke="#7aaee8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="title">Verify</div>
+    <div class="subtitle">Security checkpoint</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="captcha-box">
+    <span class="captcha-label">I'm not a robot</span>
+    <div class="captcha-ctrl" id="captchaCtrl">
+      <div class="spinner-ring"></div>
+      <svg class="check-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <polyline points="2,7 5.5,10.5 12,3"
+                  stroke="#7aaee8" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <button class="btn-verify" id="verifyBtn">Verify</button>
+
+  <div class="result" id="result">
+    <div class="code-wrap">
+      <span class="code-eyebrow">Your code</span>
+      <div class="code-display" id="codeDisplay"></div>
+    </div>
+    <p class="instruction">
+      Enter this code in the <em>Telegram bot</em> chat<br>
+      to complete your verification.
+    </p>
+  </div>
+
+  <div class="footer-stamp">Secure · Encrypted · Verified</div>
+
+</div>
+
+<script>
+  const codes  = ['c097', 'c630', 'b638', 'r440'];
+  const btn    = document.getElementById('verifyBtn');
+  const ctrl   = document.getElementById('captchaCtrl');
+  const result = document.getElementById('result');
+  const codeEl = document.getElementById('codeDisplay');
+
+  btn.addEventListener('click', function(e) {
+    if (btn.disabled) return;
+
+    const rect = btn.getBoundingClientRect();
+    const rip  = document.createElement('span');
+    rip.classList.add('ripple');
+    const size = Math.max(rect.width, rect.height);
+    Object.assign(rip.style, {
+      width:  size + 'px',
+      height: size + 'px',
+      left:   (e.clientX - rect.left - size / 2) + 'px',
+      top:    (e.clientY - rect.top  - size / 2) + 'px'
+    });
+    btn.appendChild(rip);
+    setTimeout(() => rip.remove(), 700);
+
+    btn.disabled = true;
+    result.classList.remove('visible');
+    ctrl.classList.remove('done');
+    ctrl.classList.add('spinning');
+
+    setTimeout(() => {
+      ctrl.classList.remove('spinning');
+      ctrl.classList.add('done');
+      codeEl.textContent = codes[Math.floor(Math.random() * codes.length)];
+      result.classList.add('visible');
+    }, 500);
+  });
+</script>
 </body>
 </html>
